@@ -134,6 +134,30 @@ private class strike_tst_lookupController {
 
         System.assertEquals(c.Id, record.get('value'));
     }
+
+    @isTest static void test_negative() {
+        Account a = new Account(Name='Test Account');
+        insert a;
+
+        Contact c = new Contact(
+            LastName='Contact',
+            FirstName='Test',
+            AccountId = a.Id);
+        insert c;
+
+        String jsonString = 
+            '{"searchField":"FirstName", "subtitleField": "InvalidField", "object": "Contact", "filter": "Name = \'Test Contact\'", "searchTerm": "Test"}';
+
+        Test.startTest();
+        String responseString = strike_lookupController.getRecords(jsonString);
+        Test.stopTest();
+
+        Map<String, Object> response = (Map<String, Object>)JSON.deserializeUntyped(responseString);
+        Map<string, Object> results = (Map<String, Object>)response.get('results');
+        List<Object> data =(List<Object>)results.get('data');
+
+        System.assertEquals(null, data);
+    }
 }
 /* --------------------------------------------------
 Copyright 2017 Appiphony, LLC
